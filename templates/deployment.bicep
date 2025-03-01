@@ -5,7 +5,7 @@ param appInsightsConnectionStringName string = 'AppInsights-ConnectionString'
 // @secure()
 // param appInsightsInstrumentationKey string
 
-// param appConfigName string = '${subscriptionName}-appconfig'
+param appConfigName string = '${subscriptionName}-appconfig'
 
 param servicePrincipalObjectId string
 param tenantId string = subscription().tenantId
@@ -25,14 +25,14 @@ module appServicePlanDeploy 'app.service.plan.bicep' = {
   }
 }
 
-// module appConfigDeploy 'appConfig.bicep' = {
-//   name: 'appConfigDeploy'
-//   params: {
-//     appConfigName: appConfigName
-//     appConfigEndpoint: appConfigEndpoint
-//     appConfigLabel: appConfigLabel
-//   }
-// }
+module appConfigDeploy 'app.config.bicep' = {
+  name: 'appConfigDeploy'
+  params: {
+    appConfigName: appConfigName
+    // appConfigEndpoint: appConfigEndpoint
+    // appConfigLabel: appConfigLabel
+  }
+}
 
 module appServiceDeploy 'func.app.service.bicep' = {
   name: 'appServiceDeploy'
