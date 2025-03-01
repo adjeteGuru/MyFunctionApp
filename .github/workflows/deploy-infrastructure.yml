@@ -1,0 +1,53 @@
+name: Deploy Infrastructure
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        name: Deploy Azure Functions
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Set up Azure CLI
+          uses: azure/CLI@v1
+          with:
+              azcliversion: '2.0.72'
+
+        - name: Login to Azure
+          run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+        - name: Deploy resources
+          uses: azure/arm-deploy@v2
+          with:
+            scope: 'resource-group'
+            subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            region: ${{ inputs.SERVICE_LOCATION }}
+            resourceGroupName: rg-${{ inputs.SERVICE_NAME }}-${{ inputs.SERVICE_LOCATION }}
+            template: ${{ inputs.AZURE_RESOURCES_TEMPLATE_PATH }}
+            parameters:
+                servivePrincipalId=${{ secrets.AZURE_CLIENT_ID }}
+                appInsightsConnectionString=${{ secrets.APP_INSIGHTS_CONNECTION_STRING }}
+                serviceName=${{ inputs.serviceName }}
+                serviceLocation=${{ inputs.service_location }}
+                subscriptionName=${{ vars.FUNCTION_SUBSCRIPTION_NAME }}
+                appConfigName=${{ vars.CONFIG_STORE_NAME }}
+            failOnStdError: false
+
+        - name: Download Azure Functions package
+          run: az storage blob download --container-name ${{ inputs.STORAGE_CONTAINER_NAME }} --name ${{ inputs.STORAGE_BLOB_NAME }} --file ${{ inputs.FUNCTIONS_PACKAGE_PATH }} --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+        - name: Set up Azure Functions
+          uses: azure/functions-action@v1
+          with:
+                app-name: ${{ inputs.SERVICE_NAME }}
+                package: ${{ inputs.FUNCTIONS_PACKAGE_PATH }}
+                publish-profile: ${{ secrets.AZURE_FUNCTION_PUBLISH_PROFILE }}
+            # run: |
+            #     az group create --name rg-${{ inputs.SERVICE_NAME }} --location ${{ inputs.SERVICE_LOCATION }}
+            #     az deployment group create --resource-group rg-${{ inputs.SERVICE_NAME }}-${{ inputs.SERVICE_LOCATION }} --template-file azuredeploy.json --parameters @azuredeploy.parameters.json

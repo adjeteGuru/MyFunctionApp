@@ -1,0 +1,29 @@
+name: Deploy Azure Function App
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy-config-files:
+        name: Deploy config files
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@v2
+
+        - name: Login to Azure
+          uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        - shell: pwsh instance config files
+          run: |
+             $label = "key:sample-app-config"
+             $config = Get-Content -Path configuration/KeyVaultReferences.json -Raw | ConvertFrom-Json
+                $config | ForEach-Object {
+                    $key = $_.key
+                    $value = $_.value
+                    az appconfig kv set-keyvault --name ${{ vars.CONFIG_STORE_NAME }} --key $key --secret-id $value --label $label
+                }
