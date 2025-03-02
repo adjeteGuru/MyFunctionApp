@@ -6,21 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace MyFunctionApp
 {
-    public class Function1
+    public class Function1(ILogger<Function1> logger)
     {
-        private readonly ILogger<Function1> _logger;
-
-        public Function1(ILogger<Function1> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<Function1> _logger = logger;
 
         [Function("Function1")]
-        public async Task<IActionResult> Run([HttpTrigger(Microsoft.Azure.Functions.Worker.AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        public Task<IActionResult> Run([HttpTrigger(Microsoft.Azure.Functions.Worker.AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
             var correlationId = "10506df2-f436-49a2-b11d-daa0fc1ceb26";
             _logger.LogInformation("C# HTTP trigger function processed a request. {correlationId}", correlationId);
-            return new OkObjectResult("Welcome to Azure Functions!");
+            return Task.FromResult<IActionResult>(new OkObjectResult("Welcome to Azure Functions!"));
         }
     }
 }
