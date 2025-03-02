@@ -20,18 +20,18 @@ jobs:
               azcliversion: '2.0.72'
 
         - name: Login to Azure
-          run: az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          run: az login --service-principal -u ${{ vars.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ vars.AZURE_TENANT_ID }}
 
         - name: Deploy resources
           uses: azure/arm-deploy@v2
           with:
             scope: 'resource-group'
-            subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            subscriptionId: ${{ vars.AZURE_SUBSCRIPTION_ID }}
             region: ${{ inputs.SERVICE_LOCATION }}
             resourceGroupName: rg-${{ inputs.SERVICE_NAME }}-${{ inputs.SERVICE_LOCATION }}
             template: ${{ inputs.AZURE_RESOURCES_TEMPLATE_PATH }}
             parameters:
-                servivePrincipalId=${{ secrets.AZURE_CLIENT_ID }}
+                servivePrincipalId=${{ vars.AZURE_CLIENT_ID }}
                 appInsightsConnectionString=${{ secrets.APP_INSIGHTS_CONNECTION_STRING }}
                 serviceName=${{ inputs.serviceName }}
                 serviceLocation=${{ inputs.service_location }}

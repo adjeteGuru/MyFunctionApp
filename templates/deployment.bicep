@@ -1,5 +1,5 @@
-param subscriptionName string
-param serviceLocation string = resourceGroup().location
+param subscriptionName string = 'myfunctionapp'
+param serviceLocation string = 'eastus'
 
 param appInsightsConnectionStringName string = 'AppInsights-ConnectionString'
 // @secure()
@@ -8,7 +8,7 @@ param appInsightsConnectionStringName string = 'AppInsights-ConnectionString'
 param appConfigName string = '${subscriptionName}-appconfig'
 
 param servicePrincipalObjectId string
-param tenantId string = subscription().tenantId
+param tenantId string = 'ec1db70e-b044-4442-b4cd-4c76a579cfb1'
 var appServicePlanName = '${subscriptionName}-asp'
 var functionAppName = '${subscriptionName}-func'
 var storageAccountName = '${subscriptionName}storage'
