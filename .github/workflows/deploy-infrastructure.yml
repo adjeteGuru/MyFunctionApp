@@ -27,8 +27,8 @@ jobs:
           with:
             scope: 'resource-group'
             subscriptionId: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-            region: ${{ inputs.SERVICE_LOCATION }}
-            resourceGroupName: rg-${{ inputs.SERVICE_NAME }}-${{ inputs.SERVICE_LOCATION }}
+            region: 'eastus'
+            resourceGroupName: rg-functions
             template: ${{ inputs.AZURE_RESOURCES_TEMPLATE_PATH }}
             parameters:
                 servivePrincipalId=${{ vars.AZURE_CLIENT_ID }}
